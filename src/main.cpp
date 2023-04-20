@@ -5,6 +5,8 @@
 #include <iostream>
 
 #include "utils.h"
+#include "exceptions.h"
+#include "shader.h"
 
 bool VERBOSE = false;
 bool LOG_TO_FILE = false;
@@ -26,14 +28,17 @@ int parse_cli_args(int argc, char *argv[]) {
         }
     }
 
-    log("Verbose mode: " + string(VERBOSE ? "on" : "off"), DEBUG_LOG);
-    log("Verbose mode pila: " + string(VERBOSE ? "on" : "off"), DEBUG_LOG);
-
     return 0;
+}
+
+void error(int err, const char * description) {
+    fputs(description, stderr);
 }
 
 int main(int argc, char * argv[]) {
     parse_cli_args(argc, argv);
+
+    // initialize GLFW
 
     return EXIT_SUCCESS;
 }

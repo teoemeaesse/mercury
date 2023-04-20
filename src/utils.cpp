@@ -1,6 +1,7 @@
 #include <iostream>
 #include <ctime>
 #include <chrono>
+#include <sstream>
 
 #include "utils.h"
 
@@ -101,7 +102,7 @@ ofstream *open_file_append(const char *path, bool binary) {
 }
 
 // wrapper for fstream close
-bool close_file_in(ifstream file) {
+bool close_file_in(ifstream &file) {
     file.close();
 
     if (file.is_open()) {
@@ -124,4 +125,25 @@ bool close_file_out(ofstream &file) {
     delete &file;
 
     return true;
+}
+
+// read entire file into a std::string
+const char *read_file_as_string(const char *path) {
+    ifstream *file = open_file_read(path);
+    if (!file) {
+        log("Could not read file " + string(path), ERROR_LOG);
+        return NULL;
+    }
+
+    stringstream buffer;
+    buffer << file->rdbuf();
+    close_file_in(*file);
+
+    string str = buffer.str();
+
+    char *c_str = new char[str.length() + 1];
+    c_str[str.length()] = '\0';
+    str.copy(c_str, str.length() + 1, 0);
+    
+    return c_str;
 }

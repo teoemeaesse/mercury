@@ -4,94 +4,148 @@
 #include <stdio.h>
 
 #include "shader.h"
+#include "utils.h"
+#include "exceptions.h"
 
-shader_h compile_shader(const char * src, unsigned int type) {
-    shader_h id = glCreateShader(type);
-    
-    glShaderSource(id, 1, &src, NULL);
-    glCompileShader(id);
+// ----- SHADER -----
 
+Shader::~Shader() {
+    glDeleteProgram(program);
+}
+
+// compiles the given shader
+// @throws ShaderCompilationException
+void compile_shader(unsigned int shader) {
+    glCompileShader(shader);
+
+    // check for opengl errors
     int result;
-    glGetShaderiv(id, GL_COMPILE_STATUS, &result);
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &result);
     if(!result) {
         int length;
-        glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
+        glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &length);
 
-        char * message = (char *) malloc(length * sizeof(char));
-        glGetShaderInfoLog(id, length, &length, message);
-        LOG(message);
-        free(message);
-        
-        glDeleteShader(id);
+        char *buffer = (char *) malloc(length * sizeof(char));
+        glGetShaderInfoLog(shader, length, NULL, buffer);
 
-        ERROR(ERR_SHADER_COMPILE(type), 0);
+        string message(buffer);
+        free(buffer);
+
+        throw ShaderCompilationException(message);
     }
-
-    return id;
 }
 
-shader_h new_render_shader(const char * vertex, const char * fragment) {
-    char * v_src = read_file_as_string(vertex),
-         * f_src = read_file_as_string(fragment);
-
-    shader_h program = glCreateProgram();
-    shader_h v_shader = compile_shader(v_src, GL_VERTEX_SHADER);
-    shader_h f_shader = compile_shader(f_src, GL_FRAGMENT_SHADER);
-
-    glAttachShader(program, v_shader);
-    glAttachShader(program, f_shader);
-    glValidateProgram(program);
-
-    glDeleteShader(v_shader);
-    glDeleteShader(f_shader);
-
-    return program;
-}
-
-int link_program(shader_h program) {
+// links the given shader program
+// @throws ShaderLinkingException
+void link_shader(unsigned int program) {
     glLinkProgram(program);
 
     int result;
     glGetProgramiv(program, GL_LINK_STATUS, &result);
     if(!result) {
-        LOG(ERR_SHADER_LINK);
-
         int length;
         glGetShaderiv(program, GL_INFO_LOG_LENGTH, &length);
 
-        char * message = (char *) malloc(length * sizeof(char));
-        glGetShaderInfoLog(program, length, &length, message);
-        LOG(message);
-        free(message);
+        char *buffer = (char *) malloc(length * sizeof(char));
+        glGetShaderInfoLog(program, length, &length, buffer);
+        string message(buffer);
+        free(buffer);
 
-        return -1;
-    }
-
-    return 0;
-}
-
-void gl_clear_errors() {
-    unsigned int error;
-    while(error = glGetError());
-}
-
-void gl_check_error() {
-    unsigned int error;
-    while((error = glGetError())) {
-        LOG_ERROR_GL(error);
+        throw ShaderLinkingException(message);
     }
 }
 
-void log_wg_sizes() {
-    int invocations[3] = { 0 };
-    glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_SIZE, 0, &invocations[0]);
-    glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_SIZE, 1, &invocations[1]);
-    glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_SIZE, 2, &invocations[2]);
-    
-    int work_groups[3] = { 0 };
-    glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_COUNT, 0, &work_groups[0]);
-    glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_COUNT, 1, &work_groups[1]);
-    glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_COUNT, 2, &work_groups[2]);
 
-    LOG_COMPUTE_MAX(invocations, work_groups);
+
+// ----- RENDER SHADER -----
+
+RenderShader::RenderShader(const char *vertex_path, const char *fragment_path) {
+    program = glCreateProgram();
+    vertex_shader = glCreateShader(GL_VERTEX_SHADER);
+    fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
+
+    vertex_src = read_file_as_string(vertex_path);
+    fragment_src = read_file_as_string(fragment_path);
+
+    glShaderSource(vertex_shader, 1, &vertex_src, NULL);
+    glShaderSource(fragment_shader, 1, &fragment_src, NULL);
+}
+
+RenderShader::~RenderShader() {
+    glDeleteShader(vertex_shader);
+    glDeleteShader(fragment_shader);
+    glDeleteProgram(program);
+    delete vertex_src;
+    delete fragment_src;
+}
+
+// compiles the full shader
+// @throws ShaderCompilationException
+void RenderShader::compile() {
+    if (vertex_src && fragment_src) {
+        compile_shader(vertex_shader);
+        compile_shader(fragment_shader);
+    }
+
+    else throw ShaderCompilationException("Missing shader sources to compile");
+}
+
+// attaches the shaders and links the shader program
+// @throws ShaderLinkingException
+void RenderShader::link() {
+    int vertex_compiled, fragment_compiled;
+    glGetShaderiv(vertex_shader, GL_COMPILE_STATUS, &vertex_compiled);
+    glGetShaderiv(fragment_shader, GL_COMPILE_STATUS, &fragment_compiled);
+
+    if (vertex_compiled && fragment_compiled){
+        glAttachShader(program, vertex_shader);
+        glAttachShader(program, fragment_shader);
+        glValidateProgram(program);
+        link_shader(program);
+    }
+
+    else throw ShaderCompilationException("Can't link before compiling");
+}
+
+
+
+// ----- COMPUTE SHADER -----
+
+ComputeShader::ComputeShader(const char *compute_path) {
+    compute_shader = glCreateShader(GL_COMPUTE_SHADER);
+    program = glCreateProgram();
+
+    compute_src = read_file_as_string(compute_path);
+
+    glShaderSource(compute_shader, 1, &compute_src, NULL);
+}
+
+ComputeShader::~ComputeShader() {
+    glDeleteShader(compute_shader);
+    glDeleteProgram(program);
+    delete compute_src;
+}
+
+// compiles the full shader
+// @throws ShaderCompilationException
+void ComputeShader::compile() {
+    if (compute_src) {
+        compile_shader(compute_shader);
+    }
+
+    else throw ShaderCompilationException("Missing shader sources to compile");
+}
+
+// attaches the shaders and links the shader program
+// @throws ShaderLinkingException
+void ComputeShader::link() {
+    int compute_compiled;
+    glGetShaderiv(compute_shader, GL_COMPILE_STATUS, &compute_compiled);
+
+    if (compute_compiled) {
+        glAttachShader(program, compute_shader);
+        link_shader(program);
+    }
+
+    else throw ShaderCompilationException("Can't link before compiling");
 }

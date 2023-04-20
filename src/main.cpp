@@ -6,7 +6,7 @@
 
 #include "utils.h"
 #include "exceptions.h"
-#include "shader.h"
+#include "window.h"
 
 bool VERBOSE = false;
 bool LOG_TO_FILE = false;
@@ -38,7 +38,9 @@ void error(int err, const char * description) {
 int main(int argc, char * argv[]) {
     parse_cli_args(argc, argv);
 
-    // initialize GLFW
+    Window window(800, 600, 60, "Mercury Engine");
+
+    window.start();
 
     return EXIT_SUCCESS;
 }

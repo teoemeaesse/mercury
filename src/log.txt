@@ -1,1 +1,4 @@
-[Thu Apr 20 11:18:45 2023] [DEBUG] Verbose mode: on
+[Thu Apr 20 16:37:46 2023] [ERROR] Could not open file for read shaders/vertex.glsl
+[Thu Apr 20 16:37:46 2023] [ERROR] Could not read file shaders/vertex.glsl
+[Thu Apr 20 16:37:46 2023] [ERROR] Could not open file for read shaders/fragment.glsl
+[Thu Apr 20 16:37:46 2023] [ERROR] Could not read file shaders/fragment.glsl

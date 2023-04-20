@@ -1,5 +1,6 @@
 #include <GLFW/glfw3.h>
-#include <string.h>
+#include <string>
+#include <sstream>
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -11,6 +12,10 @@
 
 Shader::~Shader() {
     glDeleteProgram(program);
+}
+
+void Shader::use() {
+    glUseProgram(program);
 }
 
 // compiles the given shader
@@ -75,8 +80,8 @@ RenderShader::~RenderShader() {
     glDeleteShader(vertex_shader);
     glDeleteShader(fragment_shader);
     glDeleteProgram(program);
-    delete vertex_src;
-    delete fragment_src;
+    delete[] vertex_src;
+    delete[] fragment_src;
 }
 
 // compiles the full shader
@@ -123,7 +128,7 @@ ComputeShader::ComputeShader(const char *compute_path) {
 ComputeShader::~ComputeShader() {
     glDeleteShader(compute_shader);
     glDeleteProgram(program);
-    delete compute_src;
+    delete[] compute_src;
 }
 
 // compiles the full shader
@@ -148,4 +153,43 @@ void ComputeShader::link() {
     }
 
     else throw ShaderCompilationException("Can't link before compiling");
+}
+
+
+
+// ----- MISC -----
+
+// clear all opengl errors
+void gl_clear_errors() {
+    unsigned int error;
+    while(error = glGetError());
+}
+
+// check for opengl errors
+void gl_check_error() {
+    unsigned int error;
+    while((error = glGetError())) {
+        log("GL error code: " + error, ERROR_LOG);
+    }
+}
+
+// log the max work group sizes and invocations for compute shaders
+void log_wg_sizes() {
+    int invocations[3] = { 0 };
+    glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_SIZE, 0, &invocations[0]);
+    glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_SIZE, 1, &invocations[1]);
+    glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_SIZE, 2, &invocations[2]);
+    
+    int work_groups[3] = { 0 };
+    glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_COUNT, 0, &work_groups[0]);
+    glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_COUNT, 1, &work_groups[1]);
+    glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_COUNT, 2, &work_groups[2]);
+
+    std::stringstream max_invocations;
+    max_invocations << "Max invocations: " << invocations[0] << ", " << invocations[1] << ", " << invocations[2];
+    log(max_invocations.str(), DEBUG_LOG);
+
+    std::stringstream max_work_groups;
+    max_work_groups << "Max work groups: " << work_groups[0] << ", " << work_groups[1] << ", " << work_groups[2];
+    log(max_work_groups.str(), DEBUG_LOG);
 }

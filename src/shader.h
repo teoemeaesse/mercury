@@ -14,6 +14,8 @@ class Shader {
         // attaches the shaders and links the shader program
         // @throws ShaderLinkingException
         virtual void link() = 0;
+
+        void use();
 };
 
 class RenderShader : public Shader {
@@ -54,13 +56,11 @@ class ComputeShader : public Shader {
         void link();
 };
 
-//unsigned int new_render_shader(const char vertex, const char * fragment);
-
-/* Clear opengl errors
+// clear all opengl errors
 void gl_clear_errors();
 
-/ Check for and print opengl errors
+// check for opengl errors
 void gl_check_error();
 
-/ Log work group and invocations max sizes for compute shaders
-void log_wg_sizes();*/
+// log the max work group sizes and invocations for compute shaders
+void log_wg_sizes();

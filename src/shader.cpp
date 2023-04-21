@@ -91,6 +91,8 @@ RenderShader::~RenderShader() {
 // compiles the full shader
 // @throws ShaderCompilationException
 void RenderShader::compile() {
+    log("Compiling render shader", DEBUG_LOG);
+
     if (vertex_src && fragment_src) {
         compile_shader(vertex_shader);
         compile_shader(fragment_shader);
@@ -102,6 +104,8 @@ void RenderShader::compile() {
 // attaches the shaders and links the shader program
 // @throws ShaderLinkingException
 void RenderShader::link() {
+    log("Linking render shader", DEBUG_LOG);
+
     int vertex_compiled, fragment_compiled;
     glGetShaderiv(vertex_shader, GL_COMPILE_STATUS, &vertex_compiled);
     glGetShaderiv(fragment_shader, GL_COMPILE_STATUS, &fragment_compiled);
@@ -138,6 +142,8 @@ ComputeShader::~ComputeShader() {
 // compiles the full shader
 // @throws ShaderCompilationException
 void ComputeShader::compile() {
+    log("Compiling compute shader", DEBUG_LOG);
+
     if (compute_src) {
         compile_shader(compute_shader);
     }
@@ -148,6 +154,8 @@ void ComputeShader::compile() {
 // attaches the shaders and links the shader program
 // @throws ShaderLinkingException
 void ComputeShader::link() {
+    log("Linking compute shader", DEBUG_LOG);
+
     int compute_compiled;
     glGetShaderiv(compute_shader, GL_COMPILE_STATUS, &compute_compiled);
 

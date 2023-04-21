@@ -133,6 +133,8 @@ const char *read_file_as_string(const char *path) {
         return NULL;
     }
 
+    log("Reading from file (" + std::string(path) + ")", DEBUG_LOG);
+
     std::stringstream buffer;
     buffer << file->rdbuf();
     close_file_in(*file);

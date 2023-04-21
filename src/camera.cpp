@@ -13,7 +13,7 @@ using namespace glm;
 Camera::Camera() {
     this->spherical = vec3(0.0f, PI / 2.0f, 1.0f);
     this->angular_velocity = 50.0f;
-    this->radial_velocity = 100.0f;
+    this->radial_velocity = 500.0f;
 }
 
 // convert spherical coordinates to cartesian coordinates

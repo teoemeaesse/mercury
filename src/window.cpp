@@ -22,6 +22,8 @@ Window::Window(int width, int height, int framerate, const char *title)
     if (!glfwInit())
         throw GLFWException(0, "Failed to initialize GLFW");
 
+    log("GLFW initialized", DEBUG_LOG);
+
     // set the window hints - we want a 4.4 core profile
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -43,6 +45,8 @@ Window::Window(int width, int height, int framerate, const char *title)
 
     // set the user pointer to this window
     glfwSetWindowUserPointer(handle, this);
+
+    log("Window setup finished", DEBUG_LOG);
 }
 
 Window::~Window() {
@@ -57,6 +61,8 @@ void Window::start() {
     glEnable(GL_BLEND);
     glfwSwapInterval(0);
 
+    log("GLFW context setup", DEBUG_LOG);
+
     // move into renderer
     // TODO: FBOs for bloom
 
@@ -65,6 +71,8 @@ void Window::start() {
 
         // TODO: postfx shaders
 
+        log("Starting up main render loop", DEBUG_LOG);
+        
         // render loop
         uint64_t delta = 1000000 / framerate,
                  acc = 0;
@@ -91,6 +99,8 @@ void Window::start() {
     } catch (ShaderCompilationException &e) {
         log(e.what(), ERROR_LOG);
     }
+
+    log("Shutting down", DEBUG_LOG);
 }
 
 // update the window dimensions after resize and set the viewport

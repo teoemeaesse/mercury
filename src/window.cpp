@@ -9,10 +9,14 @@
 
 // ----- PUBLIC METHODS -----
 
-Window::Window(int width, int height, int framerate, const char *title) {
+// @throws GLFWException
+Window::Window(int width, int height, int framerate, const char *title) 
+    : keyboard(), mouse(), camera() {
+    
     this->width = width;
     this->height = height;
     this->framerate = framerate;
+    this->frametime = 1000000 / framerate;
     this->title = title;
 
     if (!glfwInit())
@@ -54,7 +58,7 @@ void Window::start() {
     glfwSwapInterval(0);
 
     // move into renderer
-    // TODO: VAOs, VBOs, FBOs, etc.
+    // TODO: FBOs for bloom
 
     try {
         Renderer renderer("shaders/point.vert", "shaders/point.frag");
@@ -63,7 +67,7 @@ void Window::start() {
 
         // render loop
         uint64_t delta = 1000000 / framerate,
-                acc = 0;
+                 acc = 0;
         struct timespec start, end;
         while(!glfwWindowShouldClose(handle)) {
             clock_gettime(CLOCK_MONOTONIC_RAW, &start);
@@ -81,7 +85,8 @@ void Window::start() {
             glfwPollEvents();
 
             clock_gettime(CLOCK_MONOTONIC_RAW, &end);
-            acc += (end.tv_sec - start.tv_sec) * 1000000 + (end.tv_nsec - start.tv_nsec) / 1000;
+            frametime = (end.tv_sec - start.tv_sec) * 1000000 + (end.tv_nsec - start.tv_nsec) / 1000;
+            acc += frametime;
         }
     } catch (ShaderCompilationException &e) {
         log(e.what(), ERROR_LOG);
@@ -96,6 +101,12 @@ void Window::resize(int width, int height) {
     glViewport(0, 0, width, height);
 }
 
+// zoom the camera
+void Window::zoom(float y) {
+    Direction dir = y > 0 ? Direction::IN : Direction::OUT;
+    camera.zoom(dir, frametime);
+}
+
 
 
 // ----- STATIC CALLBACK FUNCTIONS -----
@@ -107,18 +118,20 @@ void resize_callback(GLFWwindow *handle, int width, int height) {
 }
 
 // keyboard callback function
-void keyboard_callback(GLFWwindow * window, int key, int scancode, int action, int mods) {
+void keyboard_callback(GLFWwindow *handle, int key, int scancode, int action, int mods) {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
-        glfwSetWindowShouldClose(window, GL_TRUE);
+        glfwSetWindowShouldClose(handle, GL_TRUE);
     }
 }
 
 // mouse wheel callback function
-void scroll_callback(GLFWwindow * window, double x, double y) {
-    // TODO
+void scroll_callback(GLFWwindow *handle, double x, double y) {
+    Window *window = (Window *) glfwGetWindowUserPointer(handle);
+    window->zoom(y);
 }
 
 // error callback function
+// @throws GLFWException
 void error_callback(int error, const char *description) {
     throw GLFWException(error, description);
 }

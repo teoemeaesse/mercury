@@ -8,6 +8,7 @@
 #include "utils.h"
 #include "exceptions.h"
 
+
 // ----- SHADER -----
 
 Shader::~Shader() {

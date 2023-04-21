@@ -29,5 +29,5 @@ class Camera {
         void rotate(float delta_theta, float delta_phi, double frame_time);
 
         // zoom in/out
-        void zoom(Direction direction , double frame_time);
+        void zoom(Direction direction, unsigned long frametime);
 };

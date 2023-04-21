@@ -3,15 +3,17 @@
 #include <stdlib.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <string>
 
 #include "camera.h"
+#include "utils.h"
 
 using namespace glm;
 
 Camera::Camera() {
     this->spherical = vec3(0.0f, PI / 2.0f, 1.0f);
     this->angular_velocity = 50.0f;
-    this->radial_velocity = 20.0f;
+    this->radial_velocity = 100.0f;
 }
 
 // convert spherical coordinates to cartesian coordinates
@@ -48,8 +50,8 @@ void Camera::rotate(float delta_theta, float delta_phi, double frame_time) {
 }
 
 // zoom in/out
-void Camera::zoom(Direction direction , double frame_time) {
-    float dt = (float) (frame_time / 1000000000.0);
+void Camera::zoom(Direction direction, unsigned long frametime) {
+    float dt = (float) (frametime / 1000000.0);
 
     if (direction == IN) {
         this->spherical.z -= this->radial_velocity * dt;

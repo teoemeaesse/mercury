@@ -88,8 +88,8 @@ Renderer::Renderer() : particle_vbo(), particle_vao() {
 
 Renderer::Renderer(const char *vertex_path, const char *fragment_path)
     : particle_vbo(), particle_vao() {
-    render_shader = new RenderShader(vertex_path, fragment_path);
 
+    render_shader = new RenderShader(vertex_path, fragment_path);
     render_shader->compile();
 }
 

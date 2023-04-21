@@ -6,8 +6,8 @@ class Window {
     private:
         int width;
         int height;
-        const char *title;
         int framerate;
+        const char *title;
         GLFWwindow *handle;
 
     public:

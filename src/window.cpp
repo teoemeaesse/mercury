@@ -4,6 +4,7 @@
 #include "utils.h"
 #include "exceptions.h"
 #include "shader.h"
+#include "renderer.h"
 
 
 // ----- PUBLIC METHODS -----
@@ -55,36 +56,35 @@ void Window::start() {
     // move into renderer
     // TODO: VAOs, VBOs, FBOs, etc.
 
-    RenderShader shader("shaders/point.vert", "shaders/point.frag");
-    shader.compile();
-    shader.link();
-    shader.use();
+    try {
+        Renderer renderer("shaders/point.vert", "shaders/point.frag");
 
-    // TODO: postfx shaders
+        // TODO: postfx shaders
 
+        // render loop
+        uint64_t delta = 1000000 / framerate,
+                acc = 0;
+        struct timespec start, end;
+        while(!glfwWindowShouldClose(handle)) {
+            clock_gettime(CLOCK_MONOTONIC_RAW, &start);
 
+            while(acc >= delta) {
+                // TODO: update simulation
+                acc -= delta;
+            }
 
-    // render loop
-    uint64_t delta = 1000000 / framerate,
-             acc = 0;
-    struct timespec start, end;
-    while(!glfwWindowShouldClose(handle)) {
-        clock_gettime(CLOCK_MONOTONIC_RAW, &start);
+            // renderer.render_particles(/* frame data */);
 
-        while(acc >= delta) {
-            // TODO: update simulation
-            acc -= delta;
+            // TODO: postfx rendering
+
+            glfwSwapBuffers(handle);
+            glfwPollEvents();
+
+            clock_gettime(CLOCK_MONOTONIC_RAW, &end);
+            acc += (end.tv_sec - start.tv_sec) * 1000000 + (end.tv_nsec - start.tv_nsec) / 1000;
         }
-
-        //render(point_shader, sim);
-
-        // TODO: postfx rendering
-
-        glfwSwapBuffers(handle);
-        glfwPollEvents();
-
-        clock_gettime(CLOCK_MONOTONIC_RAW, &end);
-        acc += (end.tv_sec - start.tv_sec) * 1000000 + (end.tv_nsec - start.tv_nsec) / 1000;
+    } catch (ShaderCompilationException &e) {
+        log(e.what(), ERROR_LOG);
     }
 }
 

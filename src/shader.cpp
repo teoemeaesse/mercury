@@ -1,8 +1,8 @@
 #include <GLFW/glfw3.h>
-#include <string>
 #include <sstream>
 #include <stdlib.h>
 #include <stdio.h>
+#include <iostream>
 
 #include "shader.h"
 #include "utils.h"
@@ -24,14 +24,15 @@ void compile_shader(unsigned int shader) {
     glCompileShader(shader);
 
     // check for opengl errors
-    int result;
+    int result = 0;
     glGetShaderiv(shader, GL_COMPILE_STATUS, &result);
     if(!result) {
-        int length;
+        int length = 0;
         glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &length);
 
-        char *buffer = (char *) malloc(length * sizeof(char));
+        char *buffer = (char *) malloc(length * sizeof(char) + 1);
         glGetShaderInfoLog(shader, length, NULL, buffer);
+        buffer[length] = '\0';
 
         string message(buffer);
         free(buffer);
@@ -53,6 +54,8 @@ void link_shader(unsigned int program) {
 
         char *buffer = (char *) malloc(length * sizeof(char));
         glGetShaderInfoLog(program, length, &length, buffer);
+        buffer[length] = '\0';
+
         string message(buffer);
         free(buffer);
 

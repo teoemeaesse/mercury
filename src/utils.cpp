@@ -127,7 +127,7 @@ bool close_file_out(ofstream &file) {
     return true;
 }
 
-// read entire file into a std::string
+// read entire file into a c string
 const char *read_file_as_string(const char *path) {
     ifstream *file = open_file_read(path);
     if (!file) {

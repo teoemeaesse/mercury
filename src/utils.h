@@ -40,5 +40,5 @@ bool close_file_in(ifstream &file);
 // wrapper for close
 bool close_file_out(ofstream &file);
 
-// read entire file into a std::string
+// read entire file into a c string
 const char *read_file_as_string(const char *path);

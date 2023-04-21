@@ -30,3 +30,11 @@
 *.exe
 *.out
 *.app
+
+# Misc
+log.txt
+*.config
+mercury
+.vscode/*
+.build/*
+build

@@ -1,9 +1,5 @@
 #pragma once
 
-#include <string>
-
-using namespace std;
-
 class Shader {
     protected:
         unsigned int program;

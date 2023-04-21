@@ -5,35 +5,33 @@
 
 #include "utils.h"
 
-using namespace std;
-
 #define LOG_FILE "log.txt"
 
 
 // ----- DEBUG -----
 
 // log useful information to the console / log file
-void log(string message, LogType type) {
+void log(std::string message, LogType type) {
     if (VERBOSE) {
         static bool file_exists = false;
 
-        time_t t = chrono::system_clock::to_time_t(chrono::system_clock::now());
-        string time = ctime(&t);
-        string time_prefix = "[" + time.substr(0, time.length() - 1) + "] ";
+        time_t t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+        std::string time = ctime(&t);
+        std::string time_prefix = "[" + time.substr(0, time.length() - 1) + "] ";
 
-        string line;
+        std::string line;
 
         if (type == DEBUG_LOG) {
             line = time_prefix + "[DEBUG] " + message + "\n";
-            cout << line;
+            std::cout << line;
         }
         else if (type == ERROR_LOG) {
             line = time_prefix + "[ERROR] " + message + "\n";
-            cerr << line;
+            std::cerr << line;
         }
 
         if (LOG_TO_FILE) {
-            ofstream *log_file = file_exists ? open_file_append(LOG_FILE) : open_file_new(LOG_FILE);
+            std::ofstream *log_file = file_exists ? open_file_append(LOG_FILE) : open_file_new(LOG_FILE);
             file_exists = true;
             (*log_file) << line;
             close_file_out(*log_file);
@@ -43,7 +41,7 @@ void log(string message, LogType type) {
 
 // print usage information
 void print_usage() {
-    cout << "Usage: ./main [-v (verbose)] [-f (write log to file)]" << endl;
+    std::cout << "Usage: ./main [-v (verbose)] [-f (write log to file)]" << std::endl;
 }
 
 
@@ -51,16 +49,16 @@ void print_usage() {
 // ----- FILE I/O -----
 
 // wrapper for fstream open
-ifstream *open_file_read(const char *path, bool binary) {
-    ifstream *file = new ifstream;
+std::ifstream *open_file_read(const char *path, bool binary) {
+    std::ifstream *file = new std::ifstream;
 
     if (binary)
-        (*file).open(path, ios::in | ios::binary);
+        (*file).open(path, std::ios::in | std::ios::binary);
     else
-        (*file).open(path, ios::in);
+        (*file).open(path, std::ios::in);
 
     if (!(*file)) {
-        log("Could not open file for read " + string(path), ERROR_LOG);
+        log("Could not open file for read " + std::string(path), ERROR_LOG);
         return NULL;
     }
 
@@ -68,16 +66,16 @@ ifstream *open_file_read(const char *path, bool binary) {
 }
 
 // wrapper for fstream open
-ofstream *open_file_new(const char *path, bool binary) {
-    ofstream *file = new ofstream;
+std::ofstream *open_file_new(const char *path, bool binary) {
+    std::ofstream *file = new std::ofstream;
 
     if (binary)
-        (*file).open(path, ios::out | ios::trunc | ios::binary);
+        (*file).open(path, std::ios::out | std::ios::trunc | std::ios::binary);
     else
-        (*file).open(path, ios::out | ios::trunc);
+        (*file).open(path, std::ios::out | std::ios::trunc);
 
     if (!(*file)) {
-        log("Could not open new file " + string(path), ERROR_LOG);
+        log("Could not open new file " + std::string(path), ERROR_LOG);
         return NULL;
     }
 
@@ -85,16 +83,16 @@ ofstream *open_file_new(const char *path, bool binary) {
 }
 
 // wrapper for fstream open
-ofstream *open_file_append(const char *path, bool binary) {
-    ofstream *file = new ofstream;
+std::ofstream *open_file_append(const char *path, bool binary) {
+    std::ofstream *file = new std::ofstream;
 
     if (binary)
-        (*file).open(path, ios::out | ios::app | ios::binary);
+        (*file).open(path, std::ios::out | std::ios::app | std::ios::binary);
     else
-        (*file).open(path, ios::out | ios::app);
+        (*file).open(path, std::ios::out | std::ios::app);
 
     if (!(*file)) {
-        log("Could not open file for append " + string(path), ERROR_LOG);
+        log("Could not open file for append " + std::string(path), ERROR_LOG);
         return NULL;
     }
 
@@ -102,7 +100,7 @@ ofstream *open_file_append(const char *path, bool binary) {
 }
 
 // wrapper for fstream close
-bool close_file_in(ifstream &file) {
+bool close_file_in(std::ifstream &file) {
     file.close();
 
     if (file.is_open()) {
@@ -115,7 +113,7 @@ bool close_file_in(ifstream &file) {
 }
 
 // wrapper for fstream close
-bool close_file_out(ofstream &file) {
+bool close_file_out(std::ofstream &file) {
     file.close();
 
     if (file.is_open()) {
@@ -129,17 +127,17 @@ bool close_file_out(ofstream &file) {
 
 // read entire file into a c string
 const char *read_file_as_string(const char *path) {
-    ifstream *file = open_file_read(path);
+    std::ifstream *file = open_file_read(path);
     if (!file) {
-        log("Could not read file " + string(path), ERROR_LOG);
+        log("Could not read file " + std::string(path), ERROR_LOG);
         return NULL;
     }
 
-    stringstream buffer;
+    std::stringstream buffer;
     buffer << file->rdbuf();
     close_file_in(*file);
 
-    string str = buffer.str();
+    std::string str = buffer.str();
 
     char *c_str = new char[str.length() + 1];
     c_str[str.length()] = '\0';

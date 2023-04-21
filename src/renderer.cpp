@@ -116,3 +116,19 @@ void Renderer::render_particles() {
 
     particle_vao.unbind();
 }
+
+// sets the render shader
+void Renderer::set_render_shader(RenderShader *render_shader) {
+    if (this->render_shader != nullptr)
+        delete this->render_shader;
+    
+    this->render_shader = render_shader;
+}
+
+// sets the render shader
+void Renderer::set_render_shader(const char *vertex_path, const char *fragment_path) {
+    if (this->render_shader != nullptr)
+        delete this->render_shader;
+        
+    this->render_shader = new RenderShader(vertex_path, fragment_path);
+}

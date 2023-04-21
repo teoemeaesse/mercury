@@ -34,7 +34,7 @@ void compile_shader(unsigned int shader) {
         glGetShaderInfoLog(shader, length, NULL, buffer);
         buffer[length] = '\0';
 
-        string message(buffer);
+        std::string message(buffer);
         free(buffer);
 
         throw ShaderCompilationException(message);
@@ -56,7 +56,7 @@ void link_shader(unsigned int program) {
         glGetShaderInfoLog(program, length, &length, buffer);
         buffer[length] = '\0';
 
-        string message(buffer);
+        std::string message(buffer);
         free(buffer);
 
         throw ShaderLinkingException(message);

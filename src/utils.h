@@ -11,13 +11,11 @@ enum LogType {
     ERROR_LOG   // log to stderr only
 };
 
-using namespace std;
-
 
 // ----- DEBUG -----
 
 // log useful information to the console / log file
-void log(string message, LogType type);
+void log(std::string message, LogType type);
 
 // print usage information
 void print_usage();
@@ -26,19 +24,19 @@ void print_usage();
 // ----- FILE I/O -----
 
 // wrapper for open
-ifstream *open_file_read(const char *path, bool binary = false);
+std::ifstream *open_file_read(const char *path, bool binary = false);
 
 // wrapper for open
-ofstream *open_file_new(const char *path, bool binary = false);
+std::ofstream *open_file_new(const char *path, bool binary = false);
 
 // wrapper for open
-ofstream *open_file_append(const char *path, bool binary = false);
+std::ofstream *open_file_append(const char *path, bool binary = false);
 
 // wrapper for close
-bool close_file_in(ifstream &file);
+bool close_file_in(std::ifstream &file);
 
 // wrapper for close
-bool close_file_out(ofstream &file);
+bool close_file_out(std::ofstream &file);
 
 // read entire file into a c string
 const char *read_file_as_string(const char *path);

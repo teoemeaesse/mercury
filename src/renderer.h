@@ -5,8 +5,6 @@
 
 #include "shader.h"
 
-using namespace std;
-
 class VBO {
     private:
         unsigned int vbo;
@@ -94,4 +92,8 @@ class Renderer {
 
         // draws all the particles in a given frame
         void render_particles(/* frame data */);
+
+        // sets the render shader
+        void set_render_shader(RenderShader *render_shader);
+        void set_render_shader(const char *vertex_path, const char *fragment_path);
 };

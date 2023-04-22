@@ -38,7 +38,7 @@ void error(int err, const char * description) {
 int main(int argc, char * argv[]) {
     parse_cli_args(argc, argv);
 
-    Window window(800, 600, 60, "Mercury Engine");
+    Window window(800, 600, 60, true, "Mercury Engine");
 
     window.start();
 

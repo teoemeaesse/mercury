@@ -51,24 +51,52 @@ void Keyboard::on_key(int key, int action) {
 Mouse::Mouse() {
     this->x = 0;
     this->y = 0;
+    this->x_acc = 0;
+    this->y_acc = 0;
+    this->scroll_acc = 0;
+    this->sensitivity = 25;
     this->left_down = false;
 }
 
 // handle mouse move input
-void Mouse::move(float x, float y, unsigned long frametime) {
-    // TODO: rotate camera, comparing new and old mouse position
-
+void Mouse::on_move(float x, float y) {
+    if (left_down) {
+        this->x_acc += (x - this->x) * sensitivity;
+        this->y_acc += (y - this->y) * sensitivity;
+    }
     this->x = x;
     this->y = y;
 }
 
 // handle mouse scroll input
-void Mouse::scroll(float y, Camera &camera, unsigned long frametime) {
-    Camera::Direction dir = y > 0 ? Camera::Direction::IN : Camera::Direction::OUT;
-    camera.zoom(dir, frametime);
+void Mouse::on_scroll(float y) {
+    scroll_acc += y;
 }
 
 // handle mouse click input
-void Mouse::click(int button, int action) {
-    // TODO: handle mouse click input
+void Mouse::on_click(int button, int action) {
+    if(action == GLFW_PRESS || action == GLFW_RELEASE)
+        if(button == GLFW_MOUSE_BUTTON_LEFT)
+            this->left_down = action;
+}
+
+// get and clear the accumulated x mouse movement
+float Mouse::consume_x_acc() {
+    float x = this->x_acc;
+    this->x_acc = 0;
+    return x;
+}
+
+// get and clear the accumulated y mouse movement
+float Mouse::consume_y_acc() {
+    float y = this->y_acc;
+    this->y_acc = 0;
+    return y;
+}
+
+// get and clear the accumulated mouse scroll
+float Mouse::consume_scroll_acc() {
+    float scroll = this->scroll_acc;
+    this->scroll_acc = 0;
+    return scroll;
 }

@@ -82,7 +82,9 @@ void VAO::set_layout(Layout &layout) {
 
 // ----- RENDERER -----
 
-Renderer::Renderer() : particle_vbo(), particle_vao() {
+Renderer::Renderer() 
+    : particle_vbo(), particle_vao() {
+    
     render_shader = nullptr;
 }
 

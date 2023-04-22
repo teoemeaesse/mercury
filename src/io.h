@@ -1,10 +1,8 @@
 #pragma once
 
-#include "camera.h"
-
 
 class Keyboard {
-    private:
+    public:
         bool 
             w_down, 
             a_down, 
@@ -17,7 +15,6 @@ class Keyboard {
             plus_down, 
             minus_down;
 
-    public:
         Keyboard();
 
         // handle keyboard input
@@ -26,18 +23,27 @@ class Keyboard {
 
 class Mouse {
     private:
-        float x, y;
-        bool left_down;
+        float x, y,
+              x_acc, y_acc,
+              scroll_acc,
+              sensitivity;
         
     public:
+        bool left_down;
+
         Mouse();
 
         // handle mouse move input
-        void move(float x, float y, unsigned long frametime);
+        void on_move(float x, float y);
 
         // handle mouse scroll input
-        void scroll(float y, Camera &camera, unsigned long frametime);
+        void on_scroll(float y);
 
         // handle mouse click input
-        void click(int button, int action);
+        void on_click(int button, int action);
+
+        // get and clear the accumulated mouse movement
+        float consume_x_acc();
+        float consume_y_acc();
+        float consume_scroll_acc();
 };

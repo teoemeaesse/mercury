@@ -10,13 +10,13 @@
 // ----- PUBLIC METHODS -----
 
 // @throws GLFWException
-Window::Window(int width, int height, int framerate, const char *title) 
+Window::Window(int width, int height, int framerate, bool vsync, const char *title) 
     : keyboard(), mouse(), camera() {
     
     this->width = width;
     this->height = height;
     this->framerate = framerate;
-    this->frametime = 1000000 / framerate;
+    this->vsync = vsync;
     this->title = title;
 
     if (!glfwInit())
@@ -61,7 +61,7 @@ void Window::start() {
     glfwMakeContextCurrent(handle);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_BLEND);
-    glfwSwapInterval(0);
+    glfwSwapInterval(vsync);
 
     log("GLFW context setup", DEBUG_LOG);
 
@@ -77,7 +77,7 @@ void Window::start() {
         
         // render loop
         uint64_t delta = 1000000 / framerate,
-                 acc = 0;
+                 acc = 0, frametime = 0;;
         struct timespec start, end;
         while(!glfwWindowShouldClose(handle)) {
             clock_gettime(CLOCK_MONOTONIC_RAW, &start);
@@ -86,6 +86,11 @@ void Window::start() {
                 // TODO: update simulation
                 acc -= delta;
             }
+
+            // update the camera
+            //camera.update(keyboard, mouse, frametime);
+
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             // renderer.render_particles(/* frame data */);
 
@@ -120,18 +125,19 @@ void Window::handle_keyboard(int key, int action) {
 
 // handle mouse wheel input
 void Window::handle_scroll(double y) {
-    mouse.scroll(y, camera, frametime);
+    mouse.on_scroll(y);
 }
 
 // handle mouse position input
 void Window::handle_mouse(double x, double y) {
-    mouse.move(x, y, frametime);
+    mouse.on_move(x, y);
 }
 
 // handle mouse click input
 void Window::handle_click(int button, int action) {
-    mouse.click(button, action);
+    mouse.on_click(button, action);
 }
+
 
 
 // ----- STATIC CALLBACK FUNCTIONS -----

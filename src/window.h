@@ -11,7 +11,7 @@ class Window {
         int width;
         int height;
         int framerate;
-        unsigned long frametime;
+        bool vsync;
         const char *title;
         GLFWwindow *handle;
         Keyboard keyboard;
@@ -19,7 +19,7 @@ class Window {
         Camera camera;
 
     public:
-        Window(int width, int height, int framerate, const char *title);
+        Window(int width, int height, int framerate, bool vsync, const char *title);
         ~Window();
 
         // start the main loop

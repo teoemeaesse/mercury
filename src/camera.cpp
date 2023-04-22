@@ -39,8 +39,8 @@ mat4 Camera::view_matrix() {
 }
 
 // rotate camera around the center - theta horizontal, phi vertical
-void Camera::rotate(float delta_theta, float delta_phi, double frame_time) {
-    float dt = (float) (frame_time / 1000000000.0);
+void Camera::rotate(float delta_theta, float delta_phi, double frametime) {
+    float dt = (float) (frametime / 1000000000.0);
 
     this->spherical.x += this->angular_velocity * delta_theta * dt;
     this->spherical.y += this->angular_velocity * delta_phi * dt;

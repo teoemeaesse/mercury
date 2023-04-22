@@ -26,10 +26,19 @@ class Window {
         void start();
 
         // update the window dimensions after resize and set the viewport
-        void resize(int width, int height);
+        void handle_resize(int width, int height);
 
-        // zoom the camera
-        void zoom(float y);
+        // handle keyboard input
+        void handle_keyboard(int key, int action); 
+        
+        // handle mouse wheel input
+        void handle_scroll(double y);
+
+        // handle mouse position input
+        void handle_mouse(double x, double y);
+
+        // handle mouse click input
+        void handle_click(int button, int action);
 };
 
 // resize callback function
@@ -40,6 +49,12 @@ void keyboard_callback(GLFWwindow *handle, int key, int scancode, int action, in
 
 // mouse wheel callback function
 void scroll_callback(GLFWwindow *handle, double x, double y);
+
+// mouse position callback function
+void mouse_callback(GLFWwindow *handle, double x, double y);
+
+// click callback function
+void click_callback(GLFWwindow *handle, int button, int action, int mods);
 
 // error callback function
 void error_callback(int error, const char *description);

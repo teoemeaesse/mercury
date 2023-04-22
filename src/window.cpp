@@ -41,6 +41,8 @@ Window::Window(int width, int height, int framerate, const char *title)
     glfwSetWindowSizeCallback(handle, resize_callback);
     glfwSetKeyCallback(handle, keyboard_callback);
     glfwSetScrollCallback(handle, scroll_callback);
+    glfwSetCursorPosCallback(handle, mouse_callback);
+    glfwSetMouseButtonCallback(handle, click_callback);
     glfwSetErrorCallback(error_callback);
 
     // set the user pointer to this window
@@ -104,19 +106,32 @@ void Window::start() {
 }
 
 // update the window dimensions after resize and set the viewport
-void Window::resize(int width, int height) {
+void Window::handle_resize(int width, int height) {
     this->width = width;
     this->height = height;
 
     glViewport(0, 0, width, height);
 }
 
-// zoom the camera
-void Window::zoom(float y) {
-    Direction dir = y > 0 ? Direction::IN : Direction::OUT;
-    camera.zoom(dir, frametime);
+// handle keyboard input
+void Window::handle_keyboard(int key, int action) {
+    keyboard.on_key(key, action);
 }
 
+// handle mouse wheel input
+void Window::handle_scroll(double y) {
+    mouse.scroll(y, camera, frametime);
+}
+
+// handle mouse position input
+void Window::handle_mouse(double x, double y) {
+    mouse.move(x, y, frametime);
+}
+
+// handle mouse click input
+void Window::handle_click(int button, int action) {
+    mouse.click(button, action);
+}
 
 
 // ----- STATIC CALLBACK FUNCTIONS -----
@@ -124,11 +139,14 @@ void Window::zoom(float y) {
 // resize callback function
 void resize_callback(GLFWwindow *handle, int width, int height) {
     Window *window = (Window *) glfwGetWindowUserPointer(handle);
-    window->resize(width, std::max(height, 1));
+    window->handle_resize(width, std::max(height, 1));
 }
 
 // keyboard callback function
 void keyboard_callback(GLFWwindow *handle, int key, int scancode, int action, int mods) {
+    Window *window = (Window *) glfwGetWindowUserPointer(handle);
+    window->handle_keyboard(key, action);
+
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
         glfwSetWindowShouldClose(handle, GL_TRUE);
     }
@@ -137,7 +155,19 @@ void keyboard_callback(GLFWwindow *handle, int key, int scancode, int action, in
 // mouse wheel callback function
 void scroll_callback(GLFWwindow *handle, double x, double y) {
     Window *window = (Window *) glfwGetWindowUserPointer(handle);
-    window->zoom(y);
+    window->handle_scroll(y);
+}
+
+// mouse position callback function
+void mouse_callback(GLFWwindow *handle, double x, double y) {
+    Window *window = (Window *) glfwGetWindowUserPointer(handle);
+    window->handle_mouse(x, y);
+}
+
+// click callback function
+void click_callback(GLFWwindow *handle, int button, int action, int mods) {
+    Window *window = (Window *) glfwGetWindowUserPointer(handle);
+    window->handle_click(button, action);
 }
 
 // error callback function

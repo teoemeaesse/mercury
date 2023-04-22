@@ -7,10 +7,6 @@ using glm::mat4;
 
 #define PI 3.1415927f
 
-enum Direction {
-    IN,
-    OUT
-};
 
 class Camera {
     private:
@@ -20,13 +16,18 @@ class Camera {
         // convert spherical coordinates to cartesian coordinates
         vec3 get_cartesian();
     public:
+        enum Direction {
+            IN,
+            OUT
+        };
+        
         Camera();
 
         // compute the camera's view matrix
         mat4 view_matrix();
 
         // rotate camera around the center - theta horizontal, phi vertical
-        void rotate(float delta_theta, float delta_phi, double frame_time);
+        void rotate(float delta_theta, float delta_phi, double frametime);
 
         // zoom in/out
         void zoom(Direction direction, unsigned long frametime);

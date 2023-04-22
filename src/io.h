@@ -1,5 +1,8 @@
 #pragma once
 
+#include "camera.h"
+
+
 class Keyboard {
     private:
         bool 
@@ -16,10 +19,25 @@ class Keyboard {
 
     public:
         Keyboard();
+
+        // handle keyboard input
+        void on_key(int key, int action);
 };
 
 class Mouse {
+    private:
+        float x, y;
+        bool left_down;
+        
     public:
-        // handle mouse input
-        void handle(float y);
+        Mouse();
+
+        // handle mouse move input
+        void move(float x, float y, unsigned long frametime);
+
+        // handle mouse scroll input
+        void scroll(float y, Camera &camera, unsigned long frametime);
+
+        // handle mouse click input
+        void click(int button, int action);
 };

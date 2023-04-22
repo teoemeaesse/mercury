@@ -41,7 +41,7 @@ void log(std::string message, LogType type) {
 
 // print usage information
 void print_usage() {
-    std::cout << "Usage: ./main [-v (verbose)] [-f (write log to file)]" << std::endl;
+    std::cout << "Usage: ./main [-v (verbose)] [-f (log to file)]" << std::endl;
 }
 
 

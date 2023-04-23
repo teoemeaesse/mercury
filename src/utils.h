@@ -21,6 +21,7 @@ void log(std::string message, LogType type);
 void print_usage();
 
 
+
 // ----- FILE I/O -----
 
 // wrapper for open

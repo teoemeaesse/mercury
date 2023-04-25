@@ -1,25 +1,38 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include <vector>
 
 using glm::vec3;
 
 
-class MassInitializer {
-    public:
-        // intialize mass at a given position
-        virtual float get_mass(vec3 position) = 0;
-};
-
 class PositionInitializer {
+    protected:
+        std::vector<vec3> relative_positions;
+
     public:
-        virtual vec3 get_position() = 0;
+        // initialize positions
+        virtual std::vector<vec3> &generate(const vec3 &center, int num_particles) = 0;
 };
 
 class VelocityInitializer {
+    protected:
+        std::vector<vec3> velocities;
+
     public:
-        virtual vec3 get_velocity() = 0;
+        // initialize velocity at a given position, relative to the center of the particle group
+        virtual std::vector<vec3> &generate(const std::vector<vec3> &relative_positions, int num_particles) = 0;
 };
+
+class MassInitializer {
+    protected:
+        std::vector<float> masses;
+
+    public:
+        // initialize mass at a given position, relative to the center of the particle group
+        virtual std::vector<float> &generate(const std::vector<vec3> &relative_positions, int num_particles) = 0;
+};
+
 
 class Particle {
     private:
@@ -28,17 +41,38 @@ class Particle {
         float mass;
     
     public:
-        Particle(ParticleInitializer &initializer);
-        Particle(
-            PositionInitializer &position_initializer,
-            VelocityInitializer &velocity_initializer,
-            MassInitializer &mass_initializer
-        );
+        Particle(vec3 position, vec3 velocity, float mass);
 };
 
 
+class ParticleGroup {
+    private:
+        std::vector<Particle> particles;
+        vec3 center;
+    
+    public:
+        ParticleGroup(
+            PositionInitializer &position_initializer,
+            VelocityInitializer &velocity_initializer,
+            MassInitializer &mass_initializer,
+            vec3 center,
+            int num_particles
+        );
 
-// ----- PARTICLE INITIALIZERS -----
+        // TODO: void *data();
+};
+
+
+class ParticleLayout {
+    private:
+        std::vector<ParticleGroup&> particle_groups;
+    
+    public:
+        // add a new group of particles to the layout
+        void push_back(ParticleGroup &particle_group);
+
+        // TODO: void *data();
+};
 
 
 
@@ -50,7 +84,9 @@ class SquarePositionInitializer : public PositionInitializer {
     
     public:
         SquarePositionInitializer(float side_length);
-        vec3 get_position();
+        
+        // initialize positions
+        std::vector<vec3> &generate(const vec3 &center, int num_particles);
 };
 
 
@@ -59,7 +95,8 @@ class SquarePositionInitializer : public PositionInitializer {
 
 class ZeroVelocityInitializer : public VelocityInitializer {
     public:
-        vec3 get_velocity();
+        // initialize velocity at a given position, relative to the center of the particle group
+        std::vector<vec3> &generate(const std::vector<vec3> &relative_positions, int num_particles);
 };
 
 
@@ -72,5 +109,7 @@ class ConstantMassInitializer : public MassInitializer {
     
     public:
         ConstantMassInitializer(float mass);
-        float get_mass(vec3 position);
+        
+        // initialize mass at a given position, relative to the center of the particle group
+        std::vector<float> &generate(const std::vector<vec3> &relative_positions, int num_particles);
 };

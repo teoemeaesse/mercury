@@ -2,11 +2,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <iostream>
+#include <vector>
 
 #include "utils.h"
 #include "exceptions.h"
 #include "window.h"
+#include "particle.h"
+#include "utils.h"
 
 bool VERBOSE = false;
 bool LOG_TO_FILE = false;

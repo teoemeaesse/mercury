@@ -11,6 +11,10 @@ Particle::Particle(vec3 position, vec3 velocity, float mass) {
 }
 
 
+vec3 Particle::get_position() {
+    return position;
+}
+
 
 // ----- PARTICLE GROUP -----
 
@@ -21,19 +25,22 @@ ParticleGroup::ParticleGroup(
     vec3 center,
     int num_particles
 ) {
-    this->particles = std::vector<Particle>(num_particles);
-    
     std::vector<vec3> &relative_positions = position_initializer.generate(center, num_particles);
     std::vector<vec3> &velocities = velocity_initializer.generate(relative_positions, num_particles);
     std::vector<float> &masses = mass_initializer.generate(relative_positions, num_particles);
 
+    particles.reserve(num_particles);
     for (int i = 0; i < num_particles; i++) {
-        particles.push_back(Particle(
+        particles.emplace_back(
             relative_positions[i] + center,
             velocities[i],
             masses[i]
-        ));
+        );
     }
+}
+
+std::vector<Particle> &ParticleGroup::get_particles() {
+    return particles;
 }
 
 
@@ -41,7 +48,7 @@ ParticleGroup::ParticleGroup(
 // ----- PARTICLE LAYOUT -----
 
 void ParticleLayout::push_back(ParticleGroup &particle_group) {
-    this->particle_groups.push_back(particle_group);
+    this->particle_groups.push_back(&particle_group);
 }
 
 
@@ -61,14 +68,15 @@ std::vector<vec3> &SquarePositionInitializer::generate(const vec3 &center, int n
     unsigned int particles_per_side = std::round(cbrt(num_particles));
     float step = side_length / particles_per_side;
 
+    relative_positions.reserve(num_particles);
     for (int x = 0; x < particles_per_side; x++) {
         for (int y = 0; y < particles_per_side; y++) {
             for (int z = 0; z < particles_per_side; z++) {
-                relative_positions.push_back(vec3(
+                relative_positions.emplace_back(
                     center.x + x * step - side_length / 2,
                     center.y + y * step - side_length / 2,
                     center.z + z * step - side_length / 2
-                ));
+                );
             }
         }
     }
@@ -86,8 +94,9 @@ std::vector<vec3> &ZeroVelocityInitializer::generate(const std::vector<vec3> &re
         return velocities;
     }
 
+    velocities.reserve(num_particles);
     for (int i = 0; i < num_particles; i++) {
-        velocities.push_back(vec3(0, 0, 0));
+        velocities.emplace_back(0, 0, 0);
     }
 
     return velocities;
@@ -103,12 +112,13 @@ ConstantMassInitializer::ConstantMassInitializer(float mass) {
 
 std::vector<float> &ConstantMassInitializer::generate(const std::vector<vec3> &relative_positions, int num_particles) {
     if (masses.size() > 0) {
-        log("MassInitializer::generate() called twice, reusing value", DEBUG_LOG);
+        log("ConstantMassInitializer::generate() called twice, reusing value", DEBUG_LOG);
         return masses;
     }
 
+    masses.reserve(num_particles);
     for (int i = 0; i < num_particles; i++) {
-        masses.push_back(1);
+        masses.push_back(mass);
     }
 
     return masses;

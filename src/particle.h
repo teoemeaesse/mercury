@@ -42,6 +42,8 @@ class Particle {
     
     public:
         Particle(vec3 position, vec3 velocity, float mass);
+
+        vec3 get_position();
 };
 
 
@@ -59,13 +61,15 @@ class ParticleGroup {
             int num_particles
         );
 
+        std::vector<Particle> &get_particles();
+
         // TODO: void *data();
 };
 
 
 class ParticleLayout {
     private:
-        std::vector<ParticleGroup&> particle_groups;
+        std::vector<ParticleGroup *> particle_groups;
     
     public:
         // add a new group of particles to the layout

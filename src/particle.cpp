@@ -10,10 +10,14 @@ Particle::Particle(vec3 position, vec3 velocity, float mass) {
     this->mass = mass;
 }
 
-
-vec3 Particle::get_position() {
+vec3 &Particle::get_position() {
     return position;
 }
+
+float &Particle::get_mass() {
+    return mass;
+}
+
 
 
 // ----- PARTICLE GROUP -----
@@ -37,10 +41,6 @@ ParticleGroup::ParticleGroup(
             masses[i]
         );
     }
-}
-
-std::vector<Particle> &ParticleGroup::get_particles() {
-    return particles;
 }
 
 

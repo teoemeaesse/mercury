@@ -1,4 +1,5 @@
 #include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -8,7 +9,8 @@
 #include "exceptions.h"
 #include "window.h"
 #include "particle.h"
-#include "utils.h"
+#include "octtree.h"
+
 
 bool VERBOSE = false;
 bool LOG_TO_FILE = false;
@@ -31,10 +33,6 @@ int parse_cli_args(int argc, char *argv[]) {
     }
 
     return 0;
-}
-
-void error(int err, const char * description) {
-    fputs(description, stderr);
 }
 
 int main(int argc, char * argv[]) {

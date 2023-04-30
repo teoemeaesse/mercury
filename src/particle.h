@@ -43,7 +43,9 @@ class Particle {
     public:
         Particle(vec3 position, vec3 velocity, float mass);
 
-        vec3 get_position();
+        vec3 &get_position();
+
+        float &get_mass();
 };
 
 
@@ -60,8 +62,6 @@ class ParticleGroup {
             vec3 center,
             int num_particles
         );
-
-        std::vector<Particle> &get_particles();
 
         // TODO: void *data();
 };

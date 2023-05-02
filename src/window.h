@@ -1,6 +1,7 @@
 #pragma once
 
 #include <GLFW/glfw3.h>
+#include <functional>
 
 #include "io.h"
 #include "camera.h"
@@ -16,14 +17,21 @@ class Window {
         GLFWwindow *handle;
         Keyboard keyboard;
         Mouse mouse;
-        Camera camera;
 
     public:
         Window(int width, int height, int framerate, bool vsync, const char *title);
         ~Window();
 
         // start the main loop
-        void start();
+        // @param render_callback the render callback function, called as fast as possible
+        // @param controller_callback the timestep callback function, called as fast as possible
+        //                            and is passed the frametime (microseconds) and user control input data
+        // @param update_callback the update callback function, called every frame
+        void start(
+            const std::function<void(int target_width, int target_height)> &render_callback,
+            const std::function<void(Keyboard &keyboard, Mouse &mouse, float frametime)> &controller_callback,
+            const std::function<void(void)> &update_callback
+        );
 
         // update the window dimensions after resize and set the viewport
         void handle_resize(int width, int height);

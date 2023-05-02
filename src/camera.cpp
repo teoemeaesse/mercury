@@ -58,6 +58,16 @@ mat4 Camera::view_matrix() {
     );
 }
 
+// compute the camera's perspective matrix
+mat4 Camera::perspective_matrix(int target_width, int target_height) {
+    return glm::perspective(
+        glm::radians(45.0f),                  // fov
+        (float) target_width / target_height, // aspect ratio
+        0.1f,                                 // near plane
+        100.0f                                // far plane
+    );
+}
+
 // update camera state based on keyboard and mouse input
 void Camera::update(Keyboard &keyboard, Mouse &mouse, unsigned long frametime) {
     // mouse rotate camera

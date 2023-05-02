@@ -83,7 +83,7 @@ void VAO::set_layout(Layout &layout) {
 // ----- RENDERER -----
 
 Renderer::Renderer() 
-    : particle_vbo(), particle_vao() {
+    : particle_vbo(), particle_vao(), camera() {
     
     render_shader = nullptr;
 }
@@ -100,12 +100,25 @@ Renderer::~Renderer() {
         delete render_shader;
 }
 
+
+// update all renderer information
+void Renderer::update(Keyboard &keyboard, Mouse &mouse, float frametime) {
+    camera.update(keyboard, mouse, frametime);
+}
+
 // draws all the particles in a given frame
-void Renderer::render_particles() {
+void Renderer::render(int target_width, int target_height) {
+    if (!ready())
+        return;
+
     Layout particle_layout;
     
     // (x, y, z)
     particle_layout.push<float>(3);
+    // (vx, vy, vz)
+    //particle_layout.push<float>(3);
+    // (mass)
+    // particle_layout.push<float>(1);
     particle_vao.set_layout(particle_layout);
 
     render_shader->use();
@@ -114,7 +127,18 @@ void Renderer::render_particles() {
     particle_vao.bind();
 
     // TODO: draw the particles
-    // particle_vbo.set_data(size, data, GL_DYNAMIC_DRAW);
+    
+    /* Render particles */
+    render_shader->set_uniform_vec2("window", target_width, target_height);
+
+    const mat4 u_view = camera.view_matrix();
+    render_shader->set_uniform_mat4("view", &u_view[0][0]);
+
+    const mat4 u_perspective = camera.perspective_matrix(target_width, target_height);
+    render_shader->set_uniform_mat4("perspective", &u_perspective[0][0]);
+
+    //particle_vbo.set_data(size, data, GL_DYNAMIC_DRAW);
+    //glDrawArrays(GL_POINTS, 0, sim->settings->n);
 
     particle_vao.unbind();
 }

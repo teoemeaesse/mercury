@@ -12,7 +12,9 @@ using glm::mat4;
 class Camera {
     private:
         vec3 spherical;                             // <theta, phi, radius>
-        float angular_velocity, radial_velocity;    // camera settings
+        float fov,
+              angular_velocity, 
+              radial_velocity;                      // camera settings
 
         // convert spherical coordinates to cartesian coordinates
         vec3 get_cartesian();
@@ -28,6 +30,9 @@ class Camera {
 
         // compute the camera's view matrix
         mat4 view_matrix();
+
+        // compute the camera's perspective matrix
+        mat4 perspective_matrix(int target_width, int target_height);
 
         // update camera state based on keyboard and mouse input
         void update(Keyboard &keyboard, Mouse &mouse, unsigned long frametime);

@@ -11,7 +11,7 @@
 
 // @throws GLFWException
 Window::Window(int width, int height, int framerate, bool vsync, const char *title) 
-    : keyboard(), mouse(), camera() {
+    : keyboard(), mouse() {
     
     this->width = width;
     this->height = height;
@@ -49,6 +49,13 @@ Window::Window(int width, int height, int framerate, bool vsync, const char *tit
     glfwSetWindowUserPointer(handle, this);
 
     log("Window setup finished", DEBUG_LOG);
+    
+    glfwMakeContextCurrent(handle);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_BLEND);
+    glfwSwapInterval(vsync);
+
+    log("GLFW context setup", DEBUG_LOG);
 }
 
 Window::~Window() {
@@ -57,22 +64,14 @@ Window::~Window() {
 }
 
 // start the main loop
-void Window::start() {
-    glfwMakeContextCurrent(handle);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable(GL_BLEND);
-    glfwSwapInterval(vsync);
-
-    log("GLFW context setup", DEBUG_LOG);
-
-    // move into renderer
+void Window::start(
+    const std::function<void(int target_width, int target_height)> &render_callback,
+    const std::function<void(Keyboard &keyboard, Mouse &mouse, float frametime)> &controller_callback,
+    const std::function<void(void)> &update_callback
+) {
     // TODO: FBOs for bloom
 
     try {
-        Renderer renderer("shaders/point.vert", "shaders/point.frag");
-
-        // TODO: postfx shaders
-
         log("Starting up main render loop", DEBUG_LOG);
         
         // render loop
@@ -83,16 +82,17 @@ void Window::start() {
             clock_gettime(CLOCK_MONOTONIC_RAW, &start);
 
             while(acc >= delta) {
-                // TODO: update simulation
+                if (update_callback)
+                    update_callback();
+
                 acc -= delta;
             }
 
-            // update the camera
-            //camera.update(keyboard, mouse, frametime);
-
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-            // renderer.render_particles(/* frame data */);
+            controller_callback(keyboard, mouse, frametime);
+
+            render_callback(width, height);
 
             // TODO: postfx rendering
 

@@ -31,7 +31,7 @@ void compile_shader(unsigned int shader) {
         int length = 0;
         glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &length);
 
-        char *buffer = (char *) malloc(length * sizeof(char) + 1);
+        char *buffer = (char *) malloc(++length * sizeof(char));
         glGetShaderInfoLog(shader, length, NULL, buffer);
         buffer[length] = '\0';
 
@@ -50,10 +50,10 @@ void link_shader(unsigned int program) {
     int result;
     glGetProgramiv(program, GL_LINK_STATUS, &result);
     if(!result) {
-        int length;
+        int length = 0;
         glGetShaderiv(program, GL_INFO_LOG_LENGTH, &length);
 
-        char *buffer = (char *) malloc(length * sizeof(char));
+        char *buffer = (char *) malloc(++length * sizeof(char));
         glGetShaderInfoLog(program, length, &length, buffer);
         buffer[length] = '\0';
 

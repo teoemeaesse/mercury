@@ -1,14 +1,25 @@
 #version 430 core
 
+layout(location = 0) in vec3 position;
+layout(location = 1) in vec3 velocity;
+//in vec3 normal;
+
+
+layout(location = 0) out vec4 o_position;
+
+
+out vec3 v_position;
+
+
 uniform vec2 window;
-uniform vec2 camera;
-uniform float zoom;
+uniform mat4 perspective;
+uniform mat4 view;
+//uniform mat4 model;
 
-layout(location = 0) in vec4 position;
-
-out vec2 velocity;
 
 void main() {
-    gl_Position = vec4(((position.x - camera.x) / window.x) * zoom , ((position.y - camera.y) / window.y) * zoom, 1.0f, 1.0f);
-    velocity = position.zw;
+    //mat4 modelview = view;// * model;
+    //v_normal = transpose(inverse(mat3(modelview))) * normal;
+    o_position = perspective * view * vec4(position * 0.05, 1.0);
+    v_position = position;
 }

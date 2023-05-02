@@ -10,6 +10,7 @@
 #include "window.h"
 #include "particle.h"
 #include "octtree.h"
+#include "renderer.h"
 
 
 bool VERBOSE = false;
@@ -68,7 +69,21 @@ int main(int argc, char * argv[]) {
 
     Window window(800, 600, 60, true, "Mercury Engine");
 
-    window.start();
+    Renderer renderer("shaders/point.vert", "shaders/point.frag");
+    
+    window.start(
+        [&renderer](int target_width, int target_height) {
+            renderer.render(target_width, target_height);
+        },
+
+        [&renderer](Keyboard &keyboard, Mouse &mouse, float frametime) {
+            renderer.update(keyboard, mouse, frametime);
+        },
+
+        [&renderer]() {
+            // TODO: update();
+        }
+    );
 
     return EXIT_SUCCESS;
 }

@@ -5,6 +5,7 @@
 
 #include "io.h"
 #include "camera.h"
+#include "renderer.h"
 
 
 class Window {
@@ -17,6 +18,7 @@ class Window {
         GLFWwindow *handle;
         Keyboard keyboard;
         Mouse mouse;
+        Renderer *renderer;
 
     public:
         Window(int width, int height, int framerate, bool vsync, const char *title);
@@ -28,10 +30,11 @@ class Window {
         //                            and is passed the frametime (microseconds) and user control input data
         // @param update_callback the update callback function, called every frame
         void start(
-            const std::function<void(int target_width, int target_height)> &render_callback,
-            const std::function<void(Keyboard &keyboard, Mouse &mouse, float frametime)> &controller_callback,
             const std::function<void(void)> &update_callback
         );
+
+        // sets the renderer context
+        void set_renderer(Renderer *renderer);
 
         // update the window dimensions after resize and set the viewport
         void handle_resize(int width, int height);

@@ -6,23 +6,6 @@
 #include "shader.h"
 #include "camera.h"
 
-class VBO {
-    private:
-        unsigned int vbo;
-
-    public:
-        VBO();
-        ~VBO();
-
-        // binds the vbo
-        void bind();
-
-        // unbinds the vbo
-        void unbind();
-
-        // load vertex data
-        void set_data(size_t size, void *data, unsigned int usage);
-};
 
 class Layout {
     struct LayoutElement {
@@ -57,6 +40,24 @@ class Layout {
             }
             return 0;
         }
+};
+
+class VBO {
+    private:
+        unsigned int vbo;
+
+    public:
+        VBO();
+        ~VBO();
+
+        // binds the vbo
+        void bind();
+
+        // unbinds the vbo
+        void unbind();
+
+        // load vertex data
+        void set_data(size_t size, void *data, unsigned int usage);
 };
 
 class VAO {

@@ -36,7 +36,7 @@ int parse_cli_args(int argc, char *argv[]) {
     return 0;
 }
 
-void test_octtree() {
+/*void test_octtree() {
     OctTree tree({vec3(-100.0, -100.0, -100.0), vec3(100.0, 100.0, 100.0)}, 4);
     std::vector<Particle> particles;
 
@@ -60,7 +60,7 @@ void test_octtree() {
     log(tree.to_string(), DEBUG_LOG);
 
     log("----- Done testing octtree -----", DEBUG_LOG);
-}
+}*/
 
 int main(int argc, char * argv[]) {
     parse_cli_args(argc, argv);
@@ -71,15 +71,9 @@ int main(int argc, char * argv[]) {
 
     Renderer renderer("shaders/point.vert", "shaders/point.frag");
     
+    window.set_renderer(&renderer);
+
     window.start(
-        [&renderer](int target_width, int target_height) {
-            renderer.render(target_width, target_height);
-        },
-
-        [&renderer](Keyboard &keyboard, Mouse &mouse, float frametime) {
-            renderer.update(keyboard, mouse, frametime);
-        },
-
         [&renderer]() {
             // TODO: update();
         }

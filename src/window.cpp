@@ -4,7 +4,6 @@
 #include "utils.h"
 #include "exceptions.h"
 #include "shader.h"
-#include "renderer.h"
 
 
 // ----- PUBLIC METHODS -----
@@ -18,6 +17,7 @@ Window::Window(int width, int height, int framerate, bool vsync, const char *tit
     this->framerate = framerate;
     this->vsync = vsync;
     this->title = title;
+    this->renderer = nullptr;
 
     if (!glfwInit())
         throw GLFWException(0, "Failed to initialize GLFW");
@@ -65,8 +65,6 @@ Window::~Window() {
 
 // start the main loop
 void Window::start(
-    const std::function<void(int target_width, int target_height)> &render_callback,
-    const std::function<void(Keyboard &keyboard, Mouse &mouse, float frametime)> &controller_callback,
     const std::function<void(void)> &update_callback
 ) {
     // TODO: FBOs for bloom
@@ -90,9 +88,10 @@ void Window::start(
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-            controller_callback(keyboard, mouse, frametime);
-
-            render_callback(width, height);
+            if (renderer) {
+                renderer->update(keyboard, mouse, frametime);
+                renderer->render(width, height);
+            }
 
             // TODO: postfx rendering
 
@@ -108,6 +107,11 @@ void Window::start(
     }
 
     log("Shutting down", DEBUG_LOG);
+}
+
+// sets the renderer context
+void Window::set_renderer(Renderer *renderer) {
+    this->renderer = renderer;
 }
 
 // update the window dimensions after resize and set the viewport

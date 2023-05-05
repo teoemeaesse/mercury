@@ -24,7 +24,7 @@ struct Node {
     vec3 total_position;
     float total_mass;
 
-    std::string to_string(int depth = 0) const {
+    /*std::string to_string(int depth = 0) const {
         std::string indent(depth * 2, ' ');
         std::stringstream ss;
         ss << indent << "Bounds: [" << bounds.min.x << ", " << bounds.min.y << ", " << bounds.min.z << "] - [";
@@ -42,7 +42,7 @@ struct Node {
             }
         }
         return ss.str();
-    }
+    }*/
 };
 
 class OctTree {
@@ -60,12 +60,12 @@ class OctTree {
 
         // convert to shader storage buffer object format
         // TODO: void *to_ssbo();
-        std::string to_string() const {
+        /*std::string to_string() const {
             if (root) {
                 return root->to_string(2);
             } else {
                 return "Empty OctTree";
             }
-        }
+        }*/
 
 };

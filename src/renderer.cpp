@@ -4,6 +4,21 @@
 #include "utils.h"
 
 
+// ----- VBO LAYOUT -----
+
+Layout::Layout() {
+    layout_elements = std::vector<LayoutElement>();
+}
+
+// adds a new element layout to the vbo
+template<>
+void Layout::push<float>(unsigned int count) {
+    layout_elements.push_back({count, GL_FALSE, GL_FLOAT});
+    stride += count * Layout::type_size(GL_FLOAT);
+}
+
+
+
 // ----- VBO -----
 
 VBO::VBO() {
@@ -24,21 +39,6 @@ void VBO::unbind() {
 
 void VBO::set_data(size_t size, void *data, unsigned int usage) {
     glBufferData(GL_ARRAY_BUFFER, size, data, usage);
-}
-
-
-
-// ----- VBO LAYOUT -----
-
-Layout::Layout() {
-    layout_elements = std::vector<LayoutElement>();
-}
-
-// adds a new element layout to the vbo
-template<>
-void Layout::push<float>(unsigned int count) {
-    layout_elements.push_back({count, GL_FALSE, GL_FLOAT});
-    stride += count * Layout::type_size(GL_FLOAT);
 }
 
 
@@ -116,7 +116,7 @@ void Renderer::render(int target_width, int target_height) {
     // (x, y, z)
     particle_layout.push<float>(3);
     // (vx, vy, vz)
-    //particle_layout.push<float>(3);
+    particle_layout.push<float>(3);
     // (mass)
     // particle_layout.push<float>(1);
     particle_vao.set_layout(particle_layout);

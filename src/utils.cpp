@@ -126,7 +126,7 @@ bool close_file_out(std::ofstream &file) {
 }
 
 // read entire file into a c string
-const char *read_file_as_string(const char *path) {
+const std::string read_file_as_string(const char *path) {
     std::ifstream *file = open_file_read(path);
     if (!file) {
         log("Could not read file " + std::string(path), ERROR_LOG);
@@ -139,11 +139,14 @@ const char *read_file_as_string(const char *path) {
     buffer << file->rdbuf();
     close_file_in(*file);
 
-    std::string str = buffer.str();
+    return buffer.str();
+}
 
-    char *c_str = new char[str.length() + 1];
-    c_str[str.length()] = '\0';
-    str.copy(c_str, str.length() + 1, 0);
-    
-    return c_str;
+// insert a string directly after a given expression in a string
+void insert_after(std::string &original, const std::string &after, const std::string &piece) {
+    unsigned long pos = original.find(after);
+    if (pos == std::string::npos)
+        return;
+
+    original.insert(pos + after.length(), piece);
 }

@@ -5,18 +5,18 @@
 
 // ----- KEYBOARD -----
 
-Keyboard::Keyboard() {
-    this->w_down = false;
-    this->a_down = false;
-    this->s_down = false;
-    this->d_down = false;
-    this->r_down = false;
-    this->f_down = false;
-    this->space_down = false;
-    this->lshift_down = false;
-    this->plus_down = false;
-    this->minus_down = false;
-}
+Keyboard::Keyboard() :
+    w_down(false),
+    a_down(false),
+    s_down(false),
+    d_down(false),
+    r_down(false),
+    f_down(false),
+    space_down(false),
+    lshift_down(false),
+    plus_down(false),
+    minus_down(false)
+{}
 
 // handle keyboard input
 void Keyboard::on_key(int key, int action) {
@@ -48,15 +48,15 @@ void Keyboard::on_key(int key, int action) {
 
 // ----- MOUSE -----
 
-Mouse::Mouse() {
-    this->x = 0;
-    this->y = 0;
-    this->x_acc = 0;
-    this->y_acc = 0;
-    this->scroll_acc = 0;
-    this->sensitivity = 25;
-    this->left_down = false;
-}
+Mouse::Mouse() :
+    x(0),
+    y(0),
+    x_acc(0),
+    y_acc(0),
+    scroll_acc(0),
+    sensitivity(25),
+    left_down(false)
+{}
 
 // handle mouse move input
 void Mouse::on_move(float x, float y) {

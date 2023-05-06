@@ -40,4 +40,7 @@ bool close_file_in(std::ifstream &file);
 bool close_file_out(std::ofstream &file);
 
 // read entire file into a c string
-const char *read_file_as_string(const char *path);
+const std::string read_file_as_string(const char *path);
+
+// insert a string directly after a given expression in a string
+void insert_after(std::string &original, const std::string &after, const std::string &piece);

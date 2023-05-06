@@ -1,6 +1,7 @@
 #pragma once
 
 #include <unordered_map>
+#include <string>
 
 class Shader {
     protected:
@@ -8,7 +9,8 @@ class Shader {
         mutable std::unordered_map<const char *, int> uniform_locations;
 
     public:
-        virtual ~Shader();
+        Shader();
+        ~Shader();
 
         // compiles the full shader
         // @throws ShaderCompilationException
@@ -17,6 +19,11 @@ class Shader {
         // attaches the shaders and links the shader program
         // @throws ShaderLinkingException
         virtual void link() = 0;
+
+        // sets a uniform int
+        void set_uniform_int(const char *name, const int value) const {
+            glUniform1i(get_uniform_location(name), value);
+        }
 
         // sets a uniform float
         void set_uniform_float(const char *name, const float value) const {
@@ -49,8 +56,8 @@ class RenderShader : public Shader {
     private:
         unsigned int vertex_shader;
         unsigned int fragment_shader;
-        const char *vertex_src;
-        const char *fragment_src;
+        const std::string vertex_src;
+        const std::string fragment_src;
 
     public:
         RenderShader(const char *vertex_path, const char *fragment_path);
@@ -67,11 +74,11 @@ class RenderShader : public Shader {
 
 class ComputeShader : public Shader {
     private:
-        unsigned int compute_shader;
-        const char *compute_src;
+        const unsigned int compute_shader;
+        std::string compute_src;
 
     public:
-        ComputeShader(const char *compute_path);
+        ComputeShader(const char *compute_path, unsigned int invocations[3]);
         ~ComputeShader();
 
         // compiles the full shader
@@ -81,6 +88,9 @@ class ComputeShader : public Shader {
         // attaches the shaders and links the shader program
         // @throws ShaderLinkingException
         void link();
+
+        // dispatches the compute shader
+        void dispatch(unsigned int work_groups[3]) const;
 };
 
 // clear all opengl errors

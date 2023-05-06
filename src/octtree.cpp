@@ -138,10 +138,10 @@ void insert_node(Node *node, Particle *particle, unsigned int depth, unsigned in
 
 
 
-OctTree::OctTree(Bounds bounds, unsigned int max_depth) {
-    this->root = create_node(bounds);
-    this->max_depth = max_depth;
-}
+OctTree::OctTree(Bounds bounds, unsigned int max_depth) :
+    root(create_node(bounds)),
+    max_depth(max_depth)
+{}
 
 OctTree::~OctTree() {
     delete_node(root);

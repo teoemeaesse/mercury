@@ -9,11 +9,11 @@
 
 using namespace glm;
 
-Camera::Camera() {
-    this->spherical = vec3(0.0f, PI / 2.0f, 1.0f);
-    this->angular_velocity = 1.0f;
-    this->radial_velocity = 100.0f;
-}
+Camera::Camera() : 
+    spherical(vec3(0.0f, PI / 2.0f, 1.0f)),
+    angular_velocity(1.0f),
+    radial_velocity(100.0f) 
+{}
 
 // convert spherical coordinates to cartesian coordinates
 vec3 Camera::get_cartesian() {

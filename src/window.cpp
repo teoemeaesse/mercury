@@ -9,16 +9,14 @@
 // ----- PUBLIC METHODS -----
 
 // @throws GLFWException
-Window::Window(int width, int height, int framerate, bool vsync, const char *title) 
-    : keyboard(), mouse() {
-    
-    this->width = width;
-    this->height = height;
-    this->framerate = framerate;
-    this->vsync = vsync;
-    this->title = title;
-    this->renderer = nullptr;
-
+Window::Window(int width, int height, int framerate, bool vsync, const char *title) : 
+    width(width), height(height),
+    framerate(framerate),
+    vsync(vsync),
+    title(title),
+    renderer(nullptr),
+    keyboard(), mouse()
+{
     if (!glfwInit())
         throw GLFWException(0, "Failed to initialize GLFW");
 

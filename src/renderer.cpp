@@ -6,9 +6,9 @@
 
 // ----- VBO LAYOUT -----
 
-Layout::Layout() {
-    layout_elements = std::vector<LayoutElement>();
-}
+Layout::Layout() :
+    layout_elements(std::vector<LayoutElement>())
+{}
 
 // adds a new element layout to the vbo
 template<>

@@ -4,11 +4,11 @@
 
 // ----- PARTICLE -----
 
-Particle::Particle(vec3 position, vec3 velocity, float mass) {
-    this->position = position;
-    this->velocity = velocity;
-    this->mass = mass;
-}
+Particle::Particle(vec3 position, vec3 velocity, float mass) :
+    position(position),
+    velocity(velocity),
+    mass(mass)
+{}
 
 vec3 &Particle::get_position() {
     return position;
@@ -55,9 +55,9 @@ void ParticleLayout::push_back(ParticleGroup &particle_group) {
 
 // ----- POSITION INITIALIZERS -----
 
-SquarePositionInitializer::SquarePositionInitializer(float side_length) {
-    this->side_length = side_length;
-}
+SquarePositionInitializer::SquarePositionInitializer(float side_length) :
+    side_length(side_length)
+{}
 
 std::vector<vec3> &SquarePositionInitializer::generate(const vec3 &center, int num_particles) {
     if (relative_positions.size() > 0) {
@@ -106,9 +106,9 @@ std::vector<vec3> &ZeroVelocityInitializer::generate(const std::vector<vec3> &re
 
 // ----- MASS INITIALIZERS -----
 
-ConstantMassInitializer::ConstantMassInitializer(float mass) {
-    this->mass = mass;
-}
+ConstantMassInitializer::ConstantMassInitializer(float mass) :
+    mass(mass)
+{}
 
 std::vector<float> &ConstantMassInitializer::generate(const std::vector<vec3> &relative_positions, int num_particles) {
     if (masses.size() > 0) {

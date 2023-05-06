@@ -11,6 +11,10 @@
 
 // ----- SHADER -----
 
+Shader::Shader() : 
+    program(glCreateProgram())
+{}
+
 Shader::~Shader() {
     glDeleteProgram(program);
 }
@@ -68,24 +72,23 @@ void link_shader(unsigned int program) {
 
 // ----- RENDER SHADER -----
 
-RenderShader::RenderShader(const char *vertex_path, const char *fragment_path) {
-    program = glCreateProgram();
-    vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-    fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-
-    vertex_src = read_file_as_string(vertex_path);
-    fragment_src = read_file_as_string(fragment_path);
-
-    glShaderSource(vertex_shader, 1, &vertex_src, NULL);
-    glShaderSource(fragment_shader, 1, &fragment_src, NULL);
+RenderShader::RenderShader(const char *vertex_path, const char *fragment_path) :
+    Shader(), 
+    vertex_shader(glCreateShader(GL_VERTEX_SHADER)),
+    fragment_shader(glCreateShader(GL_FRAGMENT_SHADER)),
+    vertex_src(read_file_as_string(vertex_path)),
+    fragment_src(read_file_as_string(fragment_path))
+{
+    const char *c_vertex_src = vertex_src.c_str();
+    const char *c_fragment_src = fragment_src.c_str();
+    glShaderSource(vertex_shader, 1, &c_vertex_src, NULL);
+    glShaderSource(fragment_shader, 1, &c_fragment_src, NULL);
 }
 
 RenderShader::~RenderShader() {
     glDeleteShader(vertex_shader);
     glDeleteShader(fragment_shader);
     glDeleteProgram(program);
-    delete[] vertex_src;
-    delete[] fragment_src;
 }
 
 // compiles the full shader
@@ -93,7 +96,7 @@ RenderShader::~RenderShader() {
 void RenderShader::compile() {
     log("Compiling render shader", DEBUG_LOG);
 
-    if (vertex_src && fragment_src) {
+    if (!vertex_src.empty() && !fragment_src.empty()) {
         compile_shader(vertex_shader);
         compile_shader(fragment_shader);
     }
@@ -124,19 +127,27 @@ void RenderShader::link() {
 
 // ----- COMPUTE SHADER -----
 
-ComputeShader::ComputeShader(const char *compute_path) {
-    compute_shader = glCreateShader(GL_COMPUTE_SHADER);
-    program = glCreateProgram();
+ComputeShader::ComputeShader(const char *compute_path, unsigned int invocations[3]) :
+    Shader(),
+    compute_shader(glCreateShader(GL_COMPUTE_SHADER)),
+    compute_src(read_file_as_string(compute_path))
+{
+    // inject invocation sizes into shader source
+    std::string x_loc("#define LOCAL_SIZE_X");
+    std::string y_loc("#define LOCAL_SIZE_Y");
+    std::string z_loc("#define LOCAL_SIZE_Z");
+    insert_after(compute_src, x_loc, " " + std::to_string(invocations[0]));
+    insert_after(compute_src, y_loc, " " + std::to_string(invocations[1]));
+    insert_after(compute_src, z_loc, " " + std::to_string(invocations[2]));
 
-    compute_src = read_file_as_string(compute_path);
-
-    glShaderSource(compute_shader, 1, &compute_src, NULL);
+    const char *c_src = compute_src.c_str(); 
+    
+    glShaderSource(compute_shader, 1, &c_src, NULL);
 }
 
 ComputeShader::~ComputeShader() {
     glDeleteShader(compute_shader);
     glDeleteProgram(program);
-    delete[] compute_src;
 }
 
 // compiles the full shader
@@ -144,7 +155,7 @@ ComputeShader::~ComputeShader() {
 void ComputeShader::compile() {
     log("Compiling compute shader", DEBUG_LOG);
 
-    if (compute_src) {
+    if (!compute_src.empty()) {
         compile_shader(compute_shader);
     }
 
@@ -165,6 +176,11 @@ void ComputeShader::link() {
     }
 
     else throw ShaderCompilationException("Can't link before compiling");
+}
+
+// dispatches the compute shader
+void ComputeShader::dispatch(unsigned int work_groups[3]) const {
+    glDispatchCompute(work_groups[0], work_groups[1], work_groups[2]);
 }
 
 

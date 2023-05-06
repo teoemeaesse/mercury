@@ -2,15 +2,23 @@
 
 #extension GL_ARB_gpu_shader_int64 : require
 
-layout(local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
+#define LOCAL_SIZE_X
+#define LOCAL_SIZE_Y
+#define LOCAL_SIZE_Z
 
-layout(std430, binding = 1) buffer i_data
+layout(local_size_x = LOCAL_SIZE_X, local_size_y = LOCAL_SIZE_Y, local_size_z = LOCAL_SIZE_Z) in;
+
+layout(std430, binding = 1) buffer i_tree
 {
-    float in_frame[];
+    BaseNode in_tree[];
 };
-layout(std430, binding = 2) buffer f_data
+layout(std430, binding = 2) buffer i_data
 {
-    float out_frame[];
+    Particle in_frame[];
+};
+layout(std430, binding = 3) buffer f_data
+{
+    Particle out_frame[];
 };
 
 struct BaseNode {
@@ -27,3 +35,9 @@ struct Particle {
     vec3 velocity;
     float mass;
 };
+
+uniform uint n_particles;
+
+void main() {
+
+}

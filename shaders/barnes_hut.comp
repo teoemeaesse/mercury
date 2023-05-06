@@ -5,6 +5,8 @@
 #define LOCAL_SIZE_X
 #define LOCAL_SIZE_Y
 #define LOCAL_SIZE_Z
+#define MAX_DEPTH
+// maximum depth of the tree (>2)
 
 layout(local_size_x = LOCAL_SIZE_X, local_size_y = LOCAL_SIZE_Y, local_size_z = LOCAL_SIZE_Z) in;
 
@@ -22,12 +24,12 @@ layout(std430, binding = 3) buffer f_data
 };
 
 struct BaseNode {
-    uint children[8];  // natural index of children (1-8), 0 if no child
+    uint children[8];  // index of children, 0 if no child
     uint particles_index; // index of first particle in this node
     uint particles_count; // number of particles in this node
 
     vec3 total_position;
-    float total_mass;
+    float total_mass, side_length;
 };
 
 struct Particle {
@@ -36,8 +38,123 @@ struct Particle {
     float mass;
 };
 
-uniform uint n_particles;
+uniform uint n_particles;   // number of particles in the frame
+uniform float theta;        // 0 = brute force (quadratic), 0.5 is most common, 1 = only root node
+
+uniform float G;            // gravitational constant
+
+
+// ----- STACK -----
+
+struct Stack {
+    // 8 children every layer, 1 root node
+    uint data[MAX_DEPTH * 8 + 1];
+    uint index;
+}
+
+Stack create_stack() {
+    Stack stack;
+    stack.index = 0;
+    return stack;
+}
+
+void push(inout Stack stack, uint element) {
+    stack.data[stack.index] = element;
+    stack.index++;
+}
+
+uint pop(inout Stack stack) {
+    stack.index--;
+    return stack.data[stack.index];
+}
+
+bool is_empty(in Stack stack) {
+    return stack.index == 0;
+}
+
+bool is_full(in Stack stack) {
+    return stack.index == MAX_DEPTH * 8 + 1;
+}
+
+
+
+// ----- BARNES-HUT -----
+
+vec3 compute_acceleration_particle(uint particle_on, uint particle_other) {
+    float rs = pow(length(in_frame[particle_other].position - in_frame[particle_on].position), 2.0);
+    float f = G * in_frame[particle_other].mass / rs;
+    return f * normalize(in_frame[particle_other].position - in_frame[particle_on].position);
+}
+
+vec3 compute_acceleration_node(uint particle_on, uint node_other) {
+    vec3 other_cm = in_tree[node_other].total_position / in_tree[node_other].total_mass;
+    float rs = pow(length(other_cm - in_frame[particle_on].position), 2.0);
+    float f = G * in_tree[node_other].total_mass / rs;
+    return f * normalize(other_cm - in_frame[particle_on].position);
+}
 
 void main() {
+    uint invocations_total = gl_NumWorkGroups.x * gl_NumWorkGroups.y * gl_NumWorkGroups.z *
+                             LOCAL_SIZE_X * LOCAL_SIZE_Y * LOCAL_SIZE_Z;
+    uint remainder = n - (invocations_total * (n / invocations_total))  // extra work for the last invocation
+    uint particles_per_inv = n / invocations_total;
 
+    uint current_invocation = gl_WorkGroupID.x +
+                              gl_WorkGroupID.y * gl_NumWorkGroups.x +
+                              gl_WorkGroupID.z * gl_NumWorkGroups.x * gl_NumWorkGroups.y;
+
+    uint start = current_invocation * particles_per_inv;
+    uint end = start + particles_per_inv;
+
+    if (current_invocation == invocations_total - 1) {
+        end += remainder;
+    }
+
+    Stack to_visit = create_stack();   // stack of nodes to visit for DFS
+    for (uint i = start; i < end; i++) {
+        uint current_node = 0;
+        uint depth = 0;
+        vec3 acceleration = vec3(0.0, 0.0, 0.0);
+
+        push(to_visit, current_node);
+
+        // traverse the tree
+        while (!is_empty(to_visit)) {
+            current_node = pop(to_visit);
+
+            // node is a leaf
+            if (in_tree[current_node].particles_count > 0) {
+                for (int j = 0; j < in_tree[current_node].particles_count; j++) {
+                    uint particle_index = in_tree[current_node].particles_index + j;
+                    if (particle_index == i) {
+                        continue;
+                    }
+
+                    acceleration += compute_acceleration_particle(i, particle_index);
+                }
+                continue;
+            }
+
+            // node is a branch
+
+            float ratio = in_tree[current_node].side_length / length(in_frame[i].position - in_tree[current_node].total_position);
+            if (ratio < theta) {
+                acceleration += compute_acceleration_node(i, current_node);
+
+                continue;
+            }
+
+            // add children to stack
+            for (int j = 0; j < 8; j++) {
+                if (in_tree[current_node].children[j] != 0 && !is_full(to_visit)) {
+                    push(to_visit, in_tree[current_node].children[j]);
+                }
+            }
+        }
+
+        // euler integration
+        out_frame[i].position = in_frame[i].position + in_frame[i].velocity;
+        out_frame[i].velocity = in_frame[i].velocity + acceleration;
+        out_frame[i].mass = in_frame[i].mass;
+    }
 }

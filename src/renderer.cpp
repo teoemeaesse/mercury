@@ -71,7 +71,7 @@ void VAO::set_layout(Layout &layout) {
     for (unsigned int i = 0; i < layout.get_layout_elements().size(); i++) {
         auto element = layout.get_layout_elements()[i];
         glEnableVertexAttribArray(i);
-        glVertexAttribPointer(i, element.count, element.type, element.normalized, layout.get_stride(), (const void *) offset);
+        glVertexAttribPointer(i, element.count, element.type, element.normalized, layout.get_stride(), reinterpret_cast<const void *>(static_cast<uintptr_t>(offset)));
         offset += element.count * Layout::type_size(element.type);
     }
 

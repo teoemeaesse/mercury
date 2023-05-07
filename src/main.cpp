@@ -11,6 +11,7 @@
 #include "particle.h"
 #include "octtree.h"
 #include "renderer.h"
+#include "menu.h"
 
 
 bool VERBOSE = false;
@@ -67,7 +68,14 @@ int main(int argc, char * argv[]) {
 
     // test_octtree();
 
+    auto main_menu = build_menu(MenuType::MAIN_MENU);
+    main_menu->run();
+
     Window window(800, 600, 60, true, "Mercury Engine");
+
+    unsigned int invocations[3] = {1, 1, 1};
+    ComputeShader compute_shader("shaders/barnes_hut.comp", invocations);
+
 
     Renderer renderer("shaders/point.vert", "shaders/point.frag");
     

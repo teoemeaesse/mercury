@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package serialization;
+
+message Particle {
+    float x = 1;
+    float y = 2;
+    float z = 3;
+    float vx = 4;
+    float vy = 5;
+    float vz = 6;
+    float mass = 7;
+}
+
+message Frame {
+    repeated Particle particles = 1;
+}
+
+message Simulation {
+    repeated Frame frames = 1;
+}

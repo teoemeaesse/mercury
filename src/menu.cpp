@@ -109,6 +109,7 @@ std::unique_ptr<Menu> build_menu(MenuType menu_type) {
                     load_simulation_menu->run();
             }));
             break;
+            
         case MenuType::LOAD_SIMULATION_MENU:
             menu = std::make_unique<Menu>("Load Simulation");
             menu->

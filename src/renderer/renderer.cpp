@@ -4,82 +4,6 @@
 #include "utils.h"
 
 
-// ----- VBO LAYOUT -----
-
-Layout::Layout() :
-    layout_elements(std::vector<LayoutElement>())
-{}
-
-// adds a new element layout to the vbo
-template<>
-void Layout::push<float>(unsigned int count) {
-    layout_elements.push_back({count, GL_FALSE, GL_FLOAT});
-    stride += count * Layout::type_size(GL_FLOAT);
-}
-
-
-
-// ----- VBO -----
-
-VBO::VBO() {
-    glGenBuffers(1, &vbo);
-}
-
-VBO::~VBO() {
-    glDeleteBuffers(1, &vbo);
-}
-
-void VBO::bind() {
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-}
-
-void VBO::unbind() {
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-}
-
-void VBO::set_data(size_t size, void *data, unsigned int usage) {
-    glBufferData(GL_ARRAY_BUFFER, size, data, usage);
-}
-
-
-
-// ----- VAO -----
-
-VAO::VAO() {
-    glGenVertexArrays(1, &vao);
-}
-
-VAO::~VAO() {
-    glDeleteVertexArrays(1, &vao);
-}
-
-// binds the vao -- must be called before every frame
-void VAO::bind() {
-    glBindVertexArray(vao);
-}
-
-// unbinds the vao
-void VAO::unbind() {
-    glBindVertexArray(0);
-}
-
-// sets a layout for this vao
-void VAO::set_layout(Layout &layout) {
-    this->bind();
-
-    unsigned int offset = 0;
-    for (unsigned int i = 0; i < layout.get_layout_elements().size(); i++) {
-        auto element = layout.get_layout_elements()[i];
-        glEnableVertexAttribArray(i);
-        glVertexAttribPointer(i, element.count, element.type, element.normalized, layout.get_stride(), reinterpret_cast<const void *>(static_cast<uintptr_t>(offset)));
-        offset += element.count * Layout::type_size(element.type);
-    }
-
-    this->unbind();
-}
-
-
-
 // ----- RENDERER -----
 
 Renderer::Renderer() 
@@ -99,7 +23,6 @@ Renderer::~Renderer() {
     if (render_shader != nullptr)
         delete render_shader;
 }
-
 
 // update all renderer information
 void Renderer::update(Keyboard &keyboard, Mouse &mouse, float frametime) {

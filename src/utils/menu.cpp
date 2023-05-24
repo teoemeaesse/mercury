@@ -99,12 +99,12 @@ std::unique_ptr<Menu> build_menu(MenuType menu_type) {
 
     switch (menu_type) {
         case MenuType::MAIN_MENU:
-            menu = std::make_unique<Menu>("Main Menu");
+            menu = std::make_unique<Menu>("Mercury");
             menu->
-                add_item(std::make_unique<Prompt>("New simulation", "Enter simulation name", [](const std::string& answer) {
+                add_item(std::make_unique<Prompt>("New...", "Enter simulation name", [](const std::string& answer) {
                     std::cout << "Answer was: " << answer << std::endl;
             })).
-                add_item(std::make_unique<Option>("Load simulation", []() {
+                add_item(std::make_unique<Option>("Load...", []() {
                     auto load_simulation_menu = build_menu(MenuType::LOAD_SIMULATION_MENU);
                     load_simulation_menu->run();
             }));

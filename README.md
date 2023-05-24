@@ -6,7 +6,8 @@ The goal of this project is to create a fast, easy to use and fully customizable
 To compile and run you need the following:
 - A GPU with **OpenGL 4.5** (or higher) support;
 - **G++** and [**GLFW 3**](https://stackoverflow.com/questions/17768008/how-to-build-install-glfw-3-and-use-it-in-a-linux-project) installed on your machine.
+- [`protobuf-compiler`](https://grpc.io/docs/protoc-installation/)
 
 ## Compile && Run
-Run `make` to compile the simulator and player.
-- player mode: `./mercury [-v (verbose)] [-f (log to file)] [sim file] [config file]`
+Run `make` to compile the project.
+- `./mercury [-v (verbose)] [-f (log to file)]`

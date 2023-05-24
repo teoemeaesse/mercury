@@ -43,12 +43,32 @@ ParticleGroup::ParticleGroup(
     }
 }
 
+// return a reference to all the particles in the group
+std::vector<Particle> &ParticleGroup::get_particles() {
+    return particles;
+}
+
 
 
 // ----- PARTICLE LAYOUT -----
 
 void ParticleLayout::push_back(ParticleGroup &particle_group) {
     this->particle_groups.push_back(&particle_group);
+}
+
+// return a list of all particles in the layout
+Particle * ParticleLayout::data() {
+    std::vector<Particle> particles;
+
+    for (auto &particle_group : particle_groups) {
+        std::vector<Particle> data = particle_group->get_particles();
+        
+        for (Particle p : data) {
+            particles.push_back(p);
+        }
+    }
+
+    return particles.data();
 }
 
 

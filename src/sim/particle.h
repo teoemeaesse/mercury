@@ -63,7 +63,8 @@ class ParticleGroup {
             int num_particles
         );
 
-        // TODO: void *data();
+        // return a reference to all the particles in the group
+        std::vector<Particle> &get_particles();
 };
 
 
@@ -75,7 +76,8 @@ class ParticleLayout {
         // add a new group of particles to the layout
         void push_back(ParticleGroup &particle_group);
 
-        // TODO: void *data();
+        // return a list of all particles in the layout
+        Particle *data();
 };
 
 
